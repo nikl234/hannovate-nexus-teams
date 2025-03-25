@@ -1,0 +1,5 @@
+services:
+  teams:
+    build: .
+    network_mode: "host"
+    
