@@ -1,4 +1,4 @@
-import { TeamsActivityHandler } from "botbuilder";
+import { TeamsActivityHandler, TurnContext } from "botbuilder";
 
 // Teams activity handler.
 // You can add your customization code here to extend your bot logic if needed.
@@ -12,7 +12,7 @@ export class TeamsBot extends TeamsActivityHandler {
       for (let cnt = 0; cnt < membersAdded.length; cnt++) {
         if (membersAdded[cnt].id) {
           await context.sendActivity(
-            'Welcome to the Command Bot! I can help you with a few simple commands. Type "helloworld" or "help" to get started.'
+            "Hi, this is Nexus! How can I help you today?"
           );
           break;
         }
