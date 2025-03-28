@@ -1,22 +1,26 @@
 import { Activity, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxBotCommandHandler, TriggerPatterns } from "@microsoft/teamsfx";
+import {
+  CommandMessage,
+  TeamsFxBotCommandHandler,
+  TriggerPatterns,
+} from "@microsoft/teamsfx";
 
 // send a Post request to https://nexus.lndnr.cc/ with a body like:
 // {
 //  "userProblem": "I need someone that can program in Java and JavaScript"
 //}
-// and returns 
-async function find_person(problem: string): Promise<string>{
+// and returns
+async function find_person(problem: string): Promise<string> {
   var payload = {
-      "userProblem": problem
+    userProblem: problem,
   };
 
-  return await fetch("https://nexus.lndnr.cc/",
-  {
-      method: "POST",
-      body: JSON.stringify(payload)
-  })
-  .then(function(res){ return res.text() })
+  return await fetch("https://nexus.lndnr.cc/find", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }).then(function (res) {
+    return res.text();
+  });
 }
 
 /**
@@ -54,7 +58,23 @@ export class GenericCommandHandler implements TeamsFxBotCommandHandler {
         if (message.text.startsWith("search:")) {
           response = (await find_person(message.text)).toString();
         } else {
-          response = `Sorry, command unknown. Please type 'help' to see the list of available commands. Your command was: ` + message.text;
+          const removedMentionText = TurnContext.removeRecipientMention(
+            context.activity
+          );
+
+          const txt = removedMentionText
+            .toLowerCase()
+            .replace(/\n|\r/g, "")
+            .trim();
+
+          const nexusResponse = await fetch("https://nexus.lndnr.cc/find", {
+            method: "POST",
+            body: JSON.stringify({ userProblem: txt }),
+          });
+          console.log(nexusResponse.status);
+          const parsedResponse = await nexusResponse.json();
+
+          response = parsedResponse.reason;
         }
     }
 
